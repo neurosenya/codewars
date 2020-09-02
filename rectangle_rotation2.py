@@ -47,8 +47,6 @@ def rectangle_rotation(a, b):
 
         if lowb > upb:
             lowb, upb = upb, lowb
-#        for i in range(int(lowb), int(upb)):
-#            rect_ints += 1
         rect_ints += round(np.floor(upb) - np.floor(lowb))
     return rect_ints
 a = list(map(int, input().split()))

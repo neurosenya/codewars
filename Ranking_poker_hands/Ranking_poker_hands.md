@@ -1,6 +1,5 @@
 # Ranking Poker Hands
 Create a poker hand that has a method to compare itself to another pokerhand:
-
 ```python
 compare_with(self, other_hand)
 ```
