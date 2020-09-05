@@ -3,7 +3,7 @@
 algorithm for expansion
 given (c1*a+c2*b)^n
 
-ALGORITHM Findinf binomial expansion
+ALGORITHM Finding binomial expansion
 DONE
 if expression starts with "-"
     c1 = -1
@@ -81,46 +81,46 @@ def expand(string) -> str:
         '''
         if x_term == '':
             if x_coef == 0:
-                return ''
-            return x_coef**power
+                return '', ''
+            return '', x_coef**power
         elif x_term != '':
             if power == 0:
-                return ''
-            elif power == 1:
-                return x_term
+                return '', 1
+            elif power == 1 and abs(x_coef) > 1:
+                return x_term, x_coef
             elif abs(x_coef) == 1:
-                return x_term + '^' + str(power)
+                if power == 1:
+                    return x_term, 1
+                return x_term + '^' + str(power), 1
             elif abs(x_coef) > 1 or x_coef == -1:
                 coef_pow = x_coef**power
-                print(coef_pow, x_term)
                 if coef_pow == 1:
                     coef_pow = ''
                 elif coef_pow == -1:
                     coef_pow = '-'
                 term_pow = str(x_term) + '^' + str(power)
-                return str(coef_pow) + term_pow
+                return term_pow, coef_pow
             elif abs(x_coef) == 0:
-                return ''
+                return '', ''
 
     expansion = []
     for i in range(0, power+1):
-        a_binom_term = binom_term(a_coef, a_term, power-i)
-        b_binom_term = binom_term(b_coef, b_term, i)
-        binom_coef = str(int(math.factorial(power) / (math.factorial(power-i) * math.factorial(i)))) + '*'
+        a, ac = binom_term(a_coef, a_term, power-i)
+        b, bc = binom_term(b_coef, b_term, i)
+        print(a, b)
+        binom_coef = int(math.factorial(power) / (math.factorial(power-i) * math.factorial(i)))
+        if b_coef:
+            binom_coef *= int(bc)
+        if a_coef:
+            binom_coef *= int(ac)
+        binom_coef = str(binom_coef) + '*'
         if '1' in binom_coef:
             binom_coef = ''
-        expansion.append(binom_coef + a_binom_term + b_binom_term)
+        expansion.append(binom_coef + a + b)
     # move the negative sign up to the front
-    for i in expansion:
-        if '-' in i:
-            i = list(i)
-            i.remove('-')
-            print(i)
-            print(''.join(i))
-            i = '-' + ''.join(i)
     return expansion
 
-s = '(-a-2r)^5'
+s = '(x+y)^2'
 print(expand(s))
 
 
