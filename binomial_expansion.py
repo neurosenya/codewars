@@ -42,6 +42,7 @@ concatanate string with '+" beetween elements of the list
 if there is "+-" substitute it with just "-"
 '''
 import re
+import math
 
 def expand(string) -> str:
     # decompose string into two expression
@@ -53,7 +54,6 @@ def expand(string) -> str:
         b = b[:-1]
     else:
         b = b[1:-1]
-    print(a, b)
     # Now we need to split our expressions into coefficient and letter
     coef = re.compile(r'-?\d*')
     term = re.compile(r'[a-zA-Z]+')
@@ -81,43 +81,47 @@ def expand(string) -> str:
         '''
         if x_term == '':
             if x_coef == 0:
-                x_binom_term = ''
-                return x_binom_term
-            x_binom_term = x_coef**power
-            return x_binom_term
+                return ''
+            return x_coef**power
         elif x_term != '':
-            if abs(x_coef) > 1 or x_coef == -1:
+            if power == 0:
+                return ''
+            elif power == 1:
+                return x_term
+            elif abs(x_coef) == 1:
+                return x_term + '^' + str(power)
+            elif abs(x_coef) > 1 or x_coef == -1:
                 coef_pow = x_coef**power
+                print(coef_pow, x_term)
                 if coef_pow == 1:
                     coef_pow = ''
                 elif coef_pow == -1:
                     coef_pow = '-'
                 term_pow = str(x_term) + '^' + str(power)
-                x_binom_term = str(coef_pow) + term_pow
-                return x_binom_term
+                return str(coef_pow) + term_pow
             elif abs(x_coef) == 0:
-                x_binom_term = ''
-                return x_binom_term
+                return ''
 
-    print(binom_term(a_coef, a_term, power))
-    return a_coef, b_coef, a_term, b_term
+    expansion = []
+    for i in range(0, power+1):
+        a_binom_term = binom_term(a_coef, a_term, power-i)
+        b_binom_term = binom_term(b_coef, b_term, i)
+        binom_coef = str(int(math.factorial(power) / (math.factorial(power-i) * math.factorial(i)))) + '*'
+        if '1' in binom_coef:
+            binom_coef = ''
+        expansion.append(binom_coef + a_binom_term + b_binom_term)
+    # move the negative sign up to the front
+    for i in expansion:
+        if '-' in i:
+            i = list(i)
+            i.remove('-')
+            print(i)
+            print(''.join(i))
+            i = '-' + ''.join(i)
+    return expansion
 
-s = '(0-4y)^2'
+s = '(-a-2r)^5'
 print(expand(s))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
