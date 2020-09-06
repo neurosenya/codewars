@@ -15,6 +15,7 @@ if expression contains intergers and after them letters:
 DONE
 extract power too
 
+DONE
 function binterm(c1*a, pow):
     if c1*a is just integers:
         calculate a_term = (c1*a)^(pow)
@@ -45,7 +46,7 @@ import re
 import math
 
 def expand(string) -> str:
-    # decompose string into two expression
+    # decompose string into two expressions
     a = re.search(re.compile(r'\(.*(\+|-)'), string).group(0)[1:-1]
     b = re.search(re.compile('(?<!\()(\+|-).*\)'), string).group(0)
     power = int(re.search(re.compile(r'\^\d*'), string).group(0)[1:])
@@ -67,21 +68,24 @@ def expand(string) -> str:
             x_term = x_term.group(0)
         else:
             x_term = ''
-        if x_coef == '':
+        if not x_coef and not x_term:
+            x_coef = 0
+        elif x_coef == '':
             x_coef = 1
         elif x_coef == '-':
             x_coef = -1
         return int(x_coef), x_term
     a_coef, a_term = special_cases(a_coef, a_term)
     b_coef, b_term = special_cases(b_coef, b_term)
-
+    print('a:',a_coef, a_term)
+    print('b:', b_coef, b_term)
     def binom_term(x_coef, x_term, power):
         ''' Calculates binomials terms that goes after
         the binomial coefficient
         '''
         if x_term == '':
             if x_coef == 0:
-                return '', ''
+                return '', 0
             return '', x_coef**power
         elif x_term != '':
             if power == 0:
@@ -94,33 +98,33 @@ def expand(string) -> str:
                 return x_term + '^' + str(power), 1
             elif abs(x_coef) > 1 or x_coef == -1:
                 coef_pow = x_coef**power
-                if coef_pow == 1:
-                    coef_pow = ''
-                elif coef_pow == -1:
-                    coef_pow = '-'
                 term_pow = str(x_term) + '^' + str(power)
                 return term_pow, coef_pow
             elif abs(x_coef) == 0:
-                return '', ''
+                return '', 0
 
     expansion = []
     for i in range(0, power+1):
+        binom_coef = int(math.factorial(power) / (math.factorial(power-i) * math.factorial(i)))
         a, ac = binom_term(a_coef, a_term, power-i)
         b, bc = binom_term(b_coef, b_term, i)
-        print(a, b)
-        binom_coef = int(math.factorial(power) / (math.factorial(power-i) * math.factorial(i)))
-        if b_coef:
+        if bc or bc == 0:
+            print('bc:', bc)
             binom_coef *= int(bc)
-        if a_coef:
+        if ac or ac == 0:
             binom_coef *= int(ac)
-        binom_coef = str(binom_coef) + '*'
-        if '1' in binom_coef:
+        binom_coef = str(binom_coef)
+        if binom_coef == '1' and a != '' or b != '':
             binom_coef = ''
+        print(binom_coef)
         expansion.append(binom_coef + a + b)
     # move the negative sign up to the front
-    return expansion
+    answ ='+'.join(expansion)
+    answ = re.sub(re.compile(r'\+-'), '-', answ)
+    answ = re.sub(re.compile(r'\*$'), '', answ)
+    return answ
 
-s = '(x+y)^2'
+s = '(x-1)^2'
 print(expand(s))
 
 
