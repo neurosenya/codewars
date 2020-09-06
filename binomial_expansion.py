@@ -77,8 +77,6 @@ def expand(string) -> str:
         return int(x_coef), x_term
     a_coef, a_term = special_cases(a_coef, a_term)
     b_coef, b_term = special_cases(b_coef, b_term)
-    print('a:',a_coef, a_term)
-    print('b:', b_coef, b_term)
     def binom_term(x_coef, x_term, power):
         ''' Calculates binomials terms that goes after
         the binomial coefficient
@@ -92,7 +90,7 @@ def expand(string) -> str:
                 return '', 1
             elif power == 1 and abs(x_coef) > 1:
                 return x_term, x_coef
-            elif abs(x_coef) == 1:
+            elif x_coef == 1:
                 if power == 1:
                     return x_term, 1
                 return x_term + '^' + str(power), 1
@@ -108,23 +106,26 @@ def expand(string) -> str:
         binom_coef = int(math.factorial(power) / (math.factorial(power-i) * math.factorial(i)))
         a, ac = binom_term(a_coef, a_term, power-i)
         b, bc = binom_term(b_coef, b_term, i)
+        print('ac:', ac)
+        print('bc:', bc)
         if bc or bc == 0:
-            print('bc:', bc)
             binom_coef *= int(bc)
         if ac or ac == 0:
             binom_coef *= int(ac)
         binom_coef = str(binom_coef)
         if binom_coef == '1' and a != '' or b != '':
             binom_coef = ''
-        print(binom_coef)
+        if binom_coef =='-1' and a != '' or b != '':
+            binom_coef = '-'
         expansion.append(binom_coef + a + b)
     # move the negative sign up to the front
     answ ='+'.join(expansion)
     answ = re.sub(re.compile(r'\+-'), '-', answ)
     answ = re.sub(re.compile(r'\*$'), '', answ)
+    answ = re.sub(re.compile(r'\^1'), '', answ)
     return answ
 
-s = '(x-1)^2'
+s = '(-a+4)^1'
 print(expand(s))
 
 
