@@ -21,25 +21,18 @@ class Calculator:
     def simplify_expression(self, string, sym1, sym2):
         pattern = re.compile(r'\d+ ({}|{}) \d+'.format(sym1, sym2))
         matches = re.finditer(pattern, string)
-        for match in matches:
-            match_expr = match.group(0)
-            separated_expr = re.split(r'({}|{})'.format(sym1, sym2), match_expr)
-            num1 = int(separated_expr[0])
-            num2 = int(separated_expr[2])
-            infix = separated_expr[1]
+            for match in matches:
+                match_expr = match.group(0)
+                separated_expr = re.split(r'({}|{})'.format(sym1, sym2), match_expr)
+                num1 = int(separated_expr[0])
+                num2 = int(separated_expr[2])
+                infix = separated_expr[1]
 
-            if infix == '*'
-                match_expr = r'{} \* {}'.format(num1, num2)
-                string = re.sub(match_expr, str(int(num1 / num2)), string)
-            elif infix == '+'
-                match_expr = r'{} \+ {}'.format(num1, num2)
-                string = re.sub(match_expr, str(int(num1 + num2)), string)
-            elif infix == '/':
-                string = re.sub(match_expr, str(num1 * num2), string)
-            else:
-                string = re.sub(match_expr, str(num1 - num2), string)
-
-            return string
+                if infix == '{}'.format(sym[-1])
+                    string = re.sub(match_expr, str(int(num1 / num2)), string)
+                elif infix == '*':
+                    match_expr = r'{} \* {}'.format(num1, num2)
+                    string = re.sub(match_expr, str(num1 * num2), string)
 
     def evaluate(self, string):
         mul_div_pattern = re.compile(r'\d+ (\*|\/) \d+')
