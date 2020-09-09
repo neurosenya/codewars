@@ -24,23 +24,24 @@ class Calculator:
         for match in matches:
             match_expr = match.group(0)
             separated_expr = re.split(r'({}|{})'.format(sym1, sym2), match_expr)
-            num1 = int(separated_expr[0]); num2 = int(separated_expr[2])
+            num1 = float(separated_expr[0]); num2 = float(separated_expr[2])
+            string = string.replace(separated_expr[0], str(num1) + ' ')
+            string = string.replace(separated_expr[2], ' ' + str(num2))
             infix = separated_expr[1]
 
             if infix == '*':
                 match_expr = r'{} \* {}'.format(num1, num2)
-                string = re.sub(match_expr, str(int(num1 * num2)), string)
+                string = re.sub(match_expr, str(num1 * num2), string)
 
             elif infix == '+':
                 match_expr = r'{} \+ {}'.format(num1, num2)
-                string = re.sub(match_expr, str(int(num1 + num2)), string)
+                string = re.sub(match_expr, str(num1 + num2), string)
 
             elif infix == '/':
-                string = re.sub(match_expr, str(int(num1 / num2)), string)
+                string = re.sub(match_expr, str(num1 / num2), string)
 
             elif infix == '-':
-                string = re.sub(match_expr, str(int(num1 - num2)), string)
-
+                string = re.sub(match_expr, str(num1 - num2), string)
             return string
 
     def parenthesis(self, string):
@@ -48,15 +49,16 @@ class Calculator:
         while '(' in string:
             match_parenth = re.search(parenthesis_pattern, string).group(0)
             string = string.replace( match_parenth, Calculator().calculate(match_parenth) )
-            rm_parenth_around_num = re.compile(r'\(\d+\)')
+            rm_parenth_around_num = re.compile(r'\(\d+\.?\d*\)')
             parenth_around_num = re.search(rm_parenth_around_num, string)
-            string = re.sub(rm_parenth_around_num, parenth_around_num.group(0)[1:-1], string)
+            if parenth_around_num:
+                string = re.sub(rm_parenth_around_num, parenth_around_num.group(0)[1:-1], string)
         return string
 
     def calculate(self, string):
         while '*' in string or '/' in string:
             string = Calculator().simplify_expression(string, sym1=r'\*', sym2=r'/')
-        while '+' in string or '-' in string:
+        while ' + ' in string or ' - ' in string:
             string = Calculator().simplify_expression(string, sym1=r'\+', sym2=r'-')
         return string
 
@@ -64,6 +66,6 @@ class Calculator:
         string = Calculator().parenthesis(string)
         return Calculator().calculate(string)
 
-string = '(12 + (3 + (1 + 1))) * (6 + 7)' 
-print('-------------------------')
+string = '3 - 10 + 5'
+print('--------------------------')
 print(Calculator().evaluate(string))
