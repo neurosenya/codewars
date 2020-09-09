@@ -19,60 +19,51 @@ import re
 class Calculator:
 
     def simplify_expression(self, string, sym1, sym2):
-        pattern = re.compile(r'\d+ ({}|{}) \d+'.format(sym1, sym2))
+        pattern = re.compile(r'\d+\.?\d* ({}|{}) \d+\.?\d*'.format(sym1, sym2))
         matches = re.finditer(pattern, string)
         for match in matches:
             match_expr = match.group(0)
             separated_expr = re.split(r'({}|{})'.format(sym1, sym2), match_expr)
-            num1 = int(separated_expr[0])
-            num2 = int(separated_expr[2])
+            num1 = int(separated_expr[0]); num2 = int(separated_expr[2])
             infix = separated_expr[1]
 
-            if infix == '*'
+            if infix == '*':
                 match_expr = r'{} \* {}'.format(num1, num2)
-                string = re.sub(match_expr, str(int(num1 / num2)), string)
-            elif infix == '+'
+                string = re.sub(match_expr, str(int(num1 * num2)), string)
+
+            elif infix == '+':
                 match_expr = r'{} \+ {}'.format(num1, num2)
                 string = re.sub(match_expr, str(int(num1 + num2)), string)
+
             elif infix == '/':
-                string = re.sub(match_expr, str(num1 * num2), string)
-            else:
-                string = re.sub(match_expr, str(num1 - num2), string)
+                string = re.sub(match_expr, str(int(num1 / num2)), string)
+
+            elif infix == '-':
+                string = re.sub(match_expr, str(int(num1 - num2)), string)
 
             return string
 
-    def evaluate(self, string):
-        mul_div_pattern = re.compile(r'\d+ (\*|\/) \d+')
-        while '*' in string or '/' in string:
-            matches = re.finditer(mul_div_pattern, string)
-            for match in matches:
-                match_expr = match.group(0)
-                separated_expr = re.split(r'(\*|\/)', match_expr)
-                num1 = int(separated_expr[0])
-                num2 = int(separated_expr[2])
-                infix = separated_expr[1]
-
-                if infix == '/':
-                    string = re.sub(match_expr, str(int(num1 / num2)), string)
-                elif infix == '*':
-                    match_expr = r'{} \* {}'.format(num1, num2)
-                    string = re.sub(match_expr, str(num1 * num2), string)
-
-        plus_minus_pattern = re.compile(r'\d+ (\+|-) \d+')
-        matches = re.finditer(plus_minus_pattern, string)
-
-        for match in matches:
-            match_expr = match.group(0)
-            separated_expr = re.split(r'(\+|-)', match_expr)
-            num1, num2 = int(separated_expr[0]), int(separated_expr[2])
-            infix = separated_expr[1]
-            if infix == '+':
-                match_expr = r'{} \+ {}'.format(num1, num2)
-                string = re.sub(match_expr, str(num1 + num2), string)
-            elif infix == '-':
-                string = re.sub(match_expr, str(num1 - num2), string)
-
+    def parenthesis(self, string):
+        parenthesis_pattern = re.compile(r'\((\d|\+|-|\/|\*| |\.)*\)')
+        while '(' in string:
+            match_parenth = re.search(parenthesis_pattern, string).group(0)
+            string = string.replace( match_parenth, Calculator().calculate(match_parenth) )
+            rm_parenth_around_num = re.compile(r'\(\d+\)')
+            parenth_around_num = re.search(rm_parenth_around_num, string)
+            string = re.sub(rm_parenth_around_num, parenth_around_num.group(0)[1:-1], string)
         return string
 
-value = Calculator().evaluate('2 * 2 * 2 / 2 + 7 * 8')
-print(value)
+    def calculate(self, string):
+        while '*' in string or '/' in string:
+            string = Calculator().simplify_expression(string, sym1=r'\*', sym2=r'/')
+        while '+' in string or '-' in string:
+            string = Calculator().simplify_expression(string, sym1=r'\+', sym2=r'-')
+        return string
+
+    def evaluate(self, string):
+        string = Calculator().parenthesis(string)
+        return Calculator().calculate(string)
+
+string = '(12 + (3 + (1 + 1))) * (6 + 7)' 
+print('-------------------------')
+print(Calculator().evaluate(string))

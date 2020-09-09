@@ -14,6 +14,7 @@ there is + or -
     3.2 Substitute x + y or x - y with a new calculated value
 4) If everything is correct return the resulting value.
 '''
+
 import re
 
 class Calculator:
@@ -21,51 +22,43 @@ class Calculator:
     def simplify_expression(self, string, sym1, sym2):
         pattern = re.compile(r'\d+ ({}|{}) \d+'.format(sym1, sym2))
         matches = re.finditer(pattern, string)
-            for match in matches:
-                match_expr = match.group(0)
-                separated_expr = re.split(r'({}|{})'.format(sym1, sym2), match_expr)
-                num1 = int(separated_expr[0])
-                num2 = int(separated_expr[2])
-                infix = separated_expr[1]
-
-                if infix == '{}'.format(sym[-1])
-                    string = re.sub(match_expr, str(int(num1 / num2)), string)
-                elif infix == '*':
-                    match_expr = r'{} \* {}'.format(num1, num2)
-                    string = re.sub(match_expr, str(num1 * num2), string)
-
-    def evaluate(self, string):
-        mul_div_pattern = re.compile(r'\d+ (\*|\/) \d+')
-        while '*' in string or '/' in string:
-            matches = re.finditer(mul_div_pattern, string)
-            for match in matches:
-                match_expr = match.group(0)
-                separated_expr = re.split(r'(\*|\/)', match_expr)
-                num1 = int(separated_expr[0])
-                num2 = int(separated_expr[2])
-                infix = separated_expr[1]
-
-                if infix == '/':
-                    string = re.sub(match_expr, str(int(num1 / num2)), string)
-                elif infix == '*':
-                    match_expr = r'{} \* {}'.format(num1, num2)
-                    string = re.sub(match_expr, str(num1 * num2), string)
-
-        plus_minus_pattern = re.compile(r'\d+ (\+|-) \d+')
-        matches = re.finditer(plus_minus_pattern, string)
-
         for match in matches:
             match_expr = match.group(0)
-            separated_expr = re.split(r'(\+|-)', match_expr)
-            num1, num2 = int(separated_expr[0]), int(separated_expr[2])
+            separated_expr = re.split(r'({}|{})'.format(sym1, sym2), match_expr)
+            num1 = int(separated_expr[0]); num2 = int(separated_expr[2])
             infix = separated_expr[1]
-            if infix == '+':
-                match_expr = r'{} \+ {}'.format(num1, num2)
-                string = re.sub(match_expr, str(num1 + num2), string)
-            elif infix == '-':
-                string = re.sub(match_expr, str(num1 - num2), string)
 
+            if infix == '*':
+                match_expr = r'{} \* {}'.format(num1, num2)
+                string = re.sub(match_expr, str(int(num1 * num2)), string)
+
+            elif infix == '+':
+                match_expr = r'{} \+ {}'.format(num1, num2)
+                string = re.sub(match_expr, str(int(num1 + num2)), string)
+
+            elif infix == '/':
+                string = re.sub(match_expr, str(int(num1 / num2)), string)
+
+            elif infix == '-':
+                string = re.sub(match_expr, str(int(num1 - num2)), string)
+
+            return string
+
+    def parenthesis(self, string):
+        parenthesis_pattern = re.compile(r'\((\d|\+|-|\/|\*| )*\)')
+        matches = re.finditer(parenthesis_pattern, string)
+        pattern = re.search(parenthesis_pattern, string)
+        print(pattern)
+        string = re.sub(parenthesis_pattern, string)
         return string
 
-value = Calculator().evaluate('2 * 2 * 2 / 2 + 7 * 8')
+    def evaluate(self, string):
+        string = Calculator().parenthesis(string)
+        while '*' in string or '/' in string:
+            string = Calculator().simplify_expression(string, sym1=r'\*', sym2=r'/')
+        while '+' in string or '-' in string:
+            string = Calculator().simplify_expression(string, sym1=r'\+', sym2=r'-')
+        return string
+
+value = Calculator().evaluate('(2 + 2) * 4 + 2')
 print(value)
