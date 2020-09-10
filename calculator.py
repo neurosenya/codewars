@@ -15,33 +15,39 @@ there is + or -
 4) If everything is correct return the resulting value.
 '''
 import re
-
 class Calculator:
 
     def simplify_expression(self, string, sym1, sym2):
-        pattern = re.compile(r'\d+\.?\d* ({}|{}) \d+\.?\d*'.format(sym1, sym2))
+        pattern = re.compile(r'[+-]?([0-9]*[.])?[0-9]+ ({}|{}) [+-]?([0-9]*[.])?[0-9]+'.format(sym1, sym2))
         matches = re.finditer(pattern, string)
         for match in matches:
             match_expr = match.group(0)
             separated_expr = re.split(r'({}|{})'.format(sym1, sym2), match_expr)
-            num1 = float(separated_expr[0]); num2 = float(separated_expr[2])
+            print(separated_expr)
+            num2 = float(separated_expr[2])
+            num1 = float(separated_expr[0])
+            # Replace integers with floats in string and match expressions
             string = string.replace(separated_expr[0], str(num1) + ' ')
             string = string.replace(separated_expr[2], ' ' + str(num2))
+            match_expr = match_expr.replace(separated_expr[0], str(num1) + ' ')
+            match_expr = match_expr.replace(separated_expr[2], ' ' + str(num2))
+
             infix = separated_expr[1]
 
             if infix == '*':
                 match_expr = r'{} \* {}'.format(num1, num2)
-                string = re.sub(match_expr, str(num1 * num2), string)
+                string = re.sub(match_expr, str(float(num1 * num2)), string)
 
             elif infix == '+':
                 match_expr = r'{} \+ {}'.format(num1, num2)
-                string = re.sub(match_expr, str(num1 + num2), string)
+                string = re.sub(match_expr, str(float(num1 + num2)), string)
 
             elif infix == '/':
-                string = re.sub(match_expr, str(num1 / num2), string)
+                string = re.sub(match_expr, str(float(num1 / num2)), string)
 
             elif infix == '-':
-                string = re.sub(match_expr, str(num1 - num2), string)
+                string = re.sub(match_expr, str(float(num1 - num2)), string)
+            print(string)
             return string
 
     def parenthesis(self, string):
@@ -56,16 +62,18 @@ class Calculator:
         return string
 
     def calculate(self, string):
-        while '*' in string or '/' in string:
+        while ' *' in string or '/' in string:
             string = Calculator().simplify_expression(string, sym1=r'\*', sym2=r'/')
         while ' + ' in string or ' - ' in string:
+            print('here')
             string = Calculator().simplify_expression(string, sym1=r'\+', sym2=r'-')
         return string
 
     def evaluate(self, string):
         string = Calculator().parenthesis(string)
-        return Calculator().calculate(string)
+        return float(Calculator().calculate(string))
 
-string = '3 - 10 + 5'
+string = '2 - 5'
+print(string)
 print('--------------------------')
 print(Calculator().evaluate(string))
