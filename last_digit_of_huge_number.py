@@ -29,23 +29,15 @@ def last_digit(lst):
             7: (1, 7, 9, 3),
             8: (6, 8, 4, 2)
                           }
-    # This part extracts only the required part for further calculations
-    # - 2 last digits
     lst = [str(i) for i in lst]
     lst = [int( str(i)[-2:] ) if len(i) > 1 else i for i in lst]
-    # I need to upgrade this part in order to properly calculate
-    # the last digit of a number to some power
-    # for that I need to find the last TWO digits
     while len(lst) > 1:
         print(lst)
         power = int( lst.pop() )
-        #number = int( str(lst.pop())[-1] )
         number = int( lst.pop() )
         new_power = number**power % 100
         lst.append(new_power)
-
     return int( str(lst[0])[-1] )
-
 
 answer = last_digit([4, 3, 6])
 print(answer)
