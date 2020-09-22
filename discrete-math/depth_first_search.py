@@ -12,14 +12,13 @@ ALGORITHM DESCRIPTION
 import numpy as np
 
 v, e = map(int, input().split())
-graph_adj = [[] for i in range(v)]
+graph_adj = {i:[] for i in range(v)}
 
 for i in range(e):
      v1, v2 = map(int, input().split())
      graph_adj[v1 - 1].append(v2-1)
      graph_adj[v2 - 1].append(v1-1)
 
-print(graph_adj)
 def depth_first_search(graph, current_vertex, visited):
     # mark vertex as visited
     visited.add(current_vertex)
@@ -28,19 +27,21 @@ def depth_first_search(graph, current_vertex, visited):
             depth_first_search(graph, i, visited)
         return visited
 
+print(graph_adj)
 num_components = 0
 visited_vertices = set()
 vertices = set(i for i in range(len(graph_adj)))
-
 num_components = 0
+
 while len(vertices) > 1:
+    if not visited_vertices and num_components > 0:
+        num_components += len(vertices)-1
+        break
     visited_vertices = depth_first_search(graph_adj, next(iter(vertices)), visited_vertices)
     num_components += 1
-    vertices -= visited_vertices
-    if len(vertices) == 1:
-        num_components += 1
+    if visited_vertices:
+        vertices -= visited_vertices
 
 print(num_components)
-
 
 

@@ -1,25 +1,32 @@
+'''
+Description of the algorithm:
+1) Check whether graph is fully connected
+2) Check whether all nodes have even degree
+3) Fleury's algorithm:
+    - Start from node 0 (it doesn't matter from which node to start if you have only even degree nodes
+    - Follow edges one at a time. Try not to go through nodes that connect two subgraphs
+    - Stop when there are no unvisited edges
+'''
 import numpy as np
 import random
 
 v, e = map(int, input().split())
-graph_adj = [[] for i in range(v)]
-
+graph_adj = {i:[] for i in range(v)}
 for i in range(e):
      v1, v2 = map(int, input().split())
      graph_adj[v1 - 1].append(v2-1)
      graph_adj[v2 - 1].append(v1-1)
 
+print(graph_adj)
 
-#graph_adj = [sorted(i, reverse=True) for i in graph_adj]
+def depth_first_search(graph, current_vertex, visited):
+    visited.add(current_vertex)
+    if graph[current_vertex]:
+        for i in set(graph[current_vertex]) - visited: # it will only visit adjacent vertices that are not visited yet
+            depth_first_search(graph, i, visited)
+        return visited
+
 def connectivity_check(graph_adj, e, v):
-    def depth_first_search(graph, current_vertex, visited):
-        # mark vertex as visited
-        visited.add(current_vertex)
-        if graph[current_vertex]:
-            for i in set(graph[current_vertex]) - visited: # it will only visit adjacent vertices that are not visited yet
-                depth_first_search(graph, i, visited)
-            return visited
-
     num_components = 0
     visited_vertices = set()
     vertices = set(i for i in range(len(graph_adj)))
@@ -33,10 +40,9 @@ def connectivity_check(graph_adj, e, v):
             vertices -= visited_vertices
             if len(vertices) == 1:
                 num_components += 1
-    if num_components > 1:
-        return None
-    else:
-        return num_components
+    return num_components
+
+print(connectivity_check(graph_adj, v, e))
 
 def even_degree_nodes(graph_adj):
     for i in graph_adj:
@@ -45,37 +51,37 @@ def even_degree_nodes(graph_adj):
     return True
 
 def eulers_cycle(graph_adj, v, e):
-    if e==1 and v==1:
-        return 'NONE'
     if e==0:
         return 'NONE'
-    if not connectivity_check(graph_adj, v, e):
+    if connectivity_check(graph_adj, v, e) > 1:
         return 'NONE'
     if not even_degree_nodes(graph_adj):
         return 'NONE'
 
-    eulers_cycle = [0]
-    node = random.randint(0, v-1)
-    S = []
-    S.append(node)
+    node = 0
+    S = [node]
     result = []
     while S:
         if graph_adj[S[-1]]:
             current_node = S[-1]
-            adj_node = graph_adj[S[-1]][-1]
+            highest_degree_node = None
+            for idx, i in enumerate(graph_adj[S[-1]]):
+                if len(graph_adj[i]) < degree:
+                    degree = len(graph_adj[i])
+                    highest_degree_node = idx
+            # select node to move next
+            adj_node = graph_adj[ S[-1] ][highest_degree_node]
             S.append(adj_node)
+            # Mark as visited edge between two nodes
             graph_adj[current_node].remove(adj_node)
             graph_adj[adj_node].remove(current_node)
         else:
             last_node = S.pop()
             result.append(last_node)
-    if result[0] != result[-1]:
-        return 'NONE'
-    if result:
+
         return [i+1 for i in result[:-1]]
 
 answer = eulers_cycle(graph_adj, v, e)
-
 if answer == 'NONE':
     print(answer)
 else:
