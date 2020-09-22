@@ -27,12 +27,11 @@ def depth_first_search(graph, current_vertex, visited):
             depth_first_search(graph, i, visited)
         return visited
 
-print(graph_adj)
+#print(graph_adj)
 def graph_components(graph_adj):
     num_components = 0
     visited_vertices = set()
     vertices = set(i for i in graph_adj.keys())
-    print(vertices)
     num_components = 0
     while len(vertices) > 1:
         if not visited_vertices and num_components > 0:
@@ -44,7 +43,7 @@ def graph_components(graph_adj):
             vertices -= visited_vertices
 
     return num_components
-print(graph_components(graph_adj))
+
 
 # The actual algorithm for finding the euler's cycle
 euler_cycle = [0]
@@ -62,30 +61,42 @@ def add_back_free_nodes(graph_adj):
         graph_adj[n] = []
     return graph_adj
 
+def even_degree_nodes(graph_adj):
+    for i in graph_adj.values():
+        if len(i) % 2 != 0 and len(i) != 0:
+            return False
+    return True
 
-while len(euler_cycle) < e: # whil
-    node = euler_cycle[-1]
-    graph_adj = remove_free_nodes(graph_adj)
-    print(graph_adj, euler_cycle)
-    if graph_adj[node]: # if it has adjacent nodes
-        # choose next point based on whether the removal of an edge will increase the no. of components in the graph
-        for n in graph_adj[node]:
-            graph_adj[node].remove(n)
-            graph_adj[n].remove(node)
-            graph_adj = remove_free_nodes(graph_adj)
-            if graph_components(graph_adj) == 1:
-                print(euler_cycle)
-                print(graph_adj)
-                euler_cycle.append(n)
-                break
-            else:
-                graph_adj = add_back_free_nodes(graph_adj)
-                graph_adj[node].append(n)
-                graph_adj[n].append(node)
+def find_euler_cycle(graph_adj, v, e):
+    if e==0:
+        return 'NONE'
+    if graph_components(graph_adj) > 1:
+        return 'NONE'
+    if not even_degree_nodes(graph_adj):
+        return 'NONE'
 
-print([i for i in euler_cycle])
+    while len(euler_cycle) < e: # whil
+        node = euler_cycle[-1]
+        graph_adj = remove_free_nodes(graph_adj)
+        if graph_adj[node]: # if it has adjacent nodes
+            # choose next point based on whether the removal of an edge will increase the no. of components in the graph
+            for n in graph_adj[node]:
+                graph_adj[node].remove(n)
+                graph_adj[n].remove(node)
+                if graph_components(graph_adj) == 1:
+                    euler_cycle.append(n)
+                    break
+                else:
+                    graph_adj[node].append(n)
+                    graph_adj[n].append(node)
+    return [i+1 for i in euler_cycle]
 
-
+answer = find_euler_cycle(graph_adj, v, e)
+if answer == 'NONE':
+    print(answer)
+else:
+    for i in answer:
+        print(i, end=' ')
 
 
 
