@@ -7,7 +7,7 @@ v, e = map(int, input().split())
 graph_adj = [[] for i in range(v)]
 
 # constructing list where each sublist contains 
-# all adjacent vertices for vertice (index + 1)
+# all adjacent vertices for a vertice under consideration (index + 1)
 visited_order = []
 for i in range(e):
     v1, v2 = map(int, input().split())
@@ -32,6 +32,7 @@ while q:
         if visited[vertex] == False:
             q.append(vertex)
             result[vertex] = result[current_vertex] + 1
+            print(result)
             visited[vertex] = True
 
 for k, v in result.items():
